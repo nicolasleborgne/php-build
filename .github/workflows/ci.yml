@@ -13,6 +13,7 @@ jobs:
           - 'centos:8'
           - 'ubuntu:18.04'
           - 'ubuntu:20.04'
+          - 'ubuntu:22.04'
         php:
           - '5.2.17'
           - '5.3.29'
@@ -61,6 +62,12 @@ jobs:
           ./install-dependencies.sh
           git clone --depth 1 https://github.com/sstephenson/bats.git
           ./bats/install.sh /usr/local
+      - name: install openssl
+        run: |
+          if [ "${{ matrix.php }}" != "8.1.6" ] && [ "${{ matrix.distro }}" = "ubuntu:22.04" ]; then
+            ./build-openssl-1.0.sh
+            echo "PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/opt/openssl@1.0/lib/pkgconfig" >> $GITHUB_ENV
+          fi
       - name: run tests
         run: |
           set -ex
